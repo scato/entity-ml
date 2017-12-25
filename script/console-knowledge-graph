@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-if ! brew services list | grep -q "neo4j.*started"; then
+if ! brew services list | grep -q "neo4j *started"; then
   brew services start neo4j
 
   echo "Waiting for webserver..."

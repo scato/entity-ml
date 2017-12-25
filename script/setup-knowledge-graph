@@ -61,7 +61,7 @@ if [ ! -e "$EDGES" ]; then
     > "$EDGES"
 fi
 
-if brew services list | grep -q "neo4j.*started"; then
+if brew services list | grep -q "neo4j *started"; then
   brew services stop neo4j
 fi
 
