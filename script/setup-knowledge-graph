@@ -1,0 +1,82 @@
+#!/bin/sh
+set -e
+
+export PYTHONPATH='src/'
+
+NEO4J_BIN=$(python -c "import os.path; print(os.path.realpath('$(which neo4j)'))")
+NEO4J_ROOT=$(dirname $(dirname "$NEO4J_BIN"))
+GRAPH_DB=$(find "$NEO4J_ROOT" -name "graph.db")
+
+LABELS_URL="http://downloads.dbpedia.org/2016-10/core-i18n/nl/labels_nl.ttl.bz2"
+LABELS="tmp/labels_nl.ttl"
+
+CATEGORY_LABELS_URL="http://downloads.dbpedia.org/2016-10/core-i18n/nl/category_labels_nl.ttl.bz2"
+CATEGORY_LABELS="tmp/category_labels_nl.ttl"
+
+ARTICLE_CATEGORIES_URL="http://downloads.dbpedia.org/2016-10/core-i18n/nl/article_categories_nl.ttl.bz2"
+ARTICLE_CATEGORIES="tmp/article_categories_nl.ttl"
+
+SKOS_CATEGORIES_URL="http://downloads.dbpedia.org/2016-10/core-i18n/nl/skos_categories_nl.ttl.bz2"
+SKOS_CATEGORIES="tmp/skos_categories_nl.ttl"
+
+MAPPINGBASED_OBJECTS_URL="http://downloads.dbpedia.org/2016-10/core-i18n/nl/mappingbased_objects_nl.ttl.bz2"
+MAPPINGBASED_OBJECTS="tmp/mappingbased_objects_nl.ttl"
+
+NODES="tmp/nodes.csv"
+EDGES="tmp/edges.csv"
+
+cd "$(dirname $0)/.."
+
+if [ ! -e "$LABELS" ]; then
+  curl "$LABELS_URL" | bunzip2 > "$LABELS"
+fi
+
+if [ ! -e "$CATEGORY_LABELS" ]; then
+  curl "$CATEGORY_LABELS_URL" | bunzip2 > "$CATEGORY_LABELS"
+fi
+
+if [ ! -e "$ARTICLE_CATEGORIES" ]; then
+  curl "$ARTICLE_CATEGORIES_URL" | bunzip2 > "$ARTICLE_CATEGORIES"
+fi
+
+if [ ! -e "$SKOS_CATEGORIES" ]; then
+  curl "$SKOS_CATEGORIES_URL" | bunzip2 > "$SKOS_CATEGORIES"
+fi
+
+if [ ! -e "$MAPPINGBASED_OBJECTS" ]; then
+  curl "$MAPPINGBASED_OBJECTS_URL" | bunzip2 > "$MAPPINGBASED_OBJECTS"
+fi
+
+if [ ! -e "$NODES" ]; then
+  echo "Creating $NODES..."
+  cat "$LABELS" "$CATEGORY_LABELS" \
+    | python -m link.knowledge_graph.create_nodes \
+    > "$NODES"
+fi
+
+if [ ! -e "$EDGES" ]; then
+  echo "Creating $EDGES..."
+  cat "$MAPPINGBASED_OBJECTS" "$ARTICLE_CATEGORIES" "$SKOS_CATEGORIES" \
+    | python -m link.knowledge_graph.create_edges \
+    > "$EDGES"
+fi
+
+if brew services list | grep -q "neo4j.*started"; then
+  brew services stop neo4j
+fi
+
+rm -rf "$GRAPH_DB"
+neo4j-admin import \
+  --id-type string \
+  --nodes:Entity="$NODES" \
+  --relationships="$EDGES" \
+  --ignore-missing-nodes
+
+brew services start neo4j
+
+echo "Waiting for Neo4j..."
+while ! cypher-shell -u neo4j -p the1 "RETURN 1" > /dev/null; do
+  sleep 1
+done
+echo "Creating index..."
+cypher-shell -u neo4j -p the1 "CREATE INDEX ON :Entity(id)"

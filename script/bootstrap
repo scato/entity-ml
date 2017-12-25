@@ -1,0 +1,19 @@
+#!/bin/sh
+set -e
+
+PYTHON_VERSION=$(cat .python-version)
+
+cd "$(dirname $0)/.."
+
+if ! brew list | grep -q "neo4j"; then
+  brew install neo4j
+  neo4j-admin set-initial-password the1
+fi
+
+if ! brew list | grep -q "pyenv"; then
+  brew install pyenv
+fi
+
+if ! pyenv versions | grep -q "$PYTHON_VERSION"; then
+  pyenv install $PYTHON_VERSION
+fi

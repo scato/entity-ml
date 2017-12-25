@@ -1,0 +1,14 @@
+#!/bin/sh
+set -e
+
+if ! brew services list | grep -q "neo4j.*started"; then
+  brew services start neo4j
+
+  echo "Waiting for webserver..."
+  while ! curl -Is "http://localhost:7474/browser/" > /dev/null; do
+    sleep 1
+  done
+fi
+
+echo "Opening neo4j webconsole..."
+open "http://localhost:7474/browser/"
