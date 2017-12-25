@@ -10,3 +10,4 @@ if [ ! -e tmp/ ]; then
 fi
 
 script/setup-knowledge-graph
+script/setup-nlp

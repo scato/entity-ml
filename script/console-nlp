@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+export PYTHONPATH='src/'
+
+cd "$(dirname $0)/.."
+
+if [ -z "$1" ]; then
+  echo "Usage: $0 \"sentence\""
+  exit 1
+fi
+
+python -m link.nlp.console "$1"

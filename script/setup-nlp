@@ -1,0 +1,60 @@
+#!/bin/sh
+set -e
+
+export PYTHONPATH='src/'
+
+LABELS_URL="http://downloads.dbpedia.org/2016-10/core-i18n/nl/labels_nl.ttl.bz2"
+LABELS="tmp/labels_nl.ttl"
+
+DICTIONARY="tmp/dictionary.json"
+
+cd "$(dirname $0)/.."
+
+if [ ! -e "$LABELS" ]; then
+  curl "$LABELS_URL" | bunzip2 > "$LABELS"
+fi
+
+if [ ! -e "$DICTIONARY" ]; then
+  echo "Creating $DICTIONARY..."
+  cat "$LABELS" \
+    | python -m link.nlp.create_dictionary \
+    > "$DICTIONARY"
+
+  split -l 1000000 "$DICTIONARY" "$DICTIONARY-"
+fi
+
+if ! brew services list | grep -q "elasticsearch *started"; then
+  brew services start elasticsearch
+
+  echo "Waiting for elasticsearch..."
+  while ! curl -Is "localhost:9200" > /dev/null; do
+    sleep 1
+  done
+fi
+
+echo "Creating dictionary index..."
+curl -s -XDELETE 'localhost:9200/dictionary' > /dev/null
+curl -sf -XPUT 'localhost:9200/dictionary?pretty' -H 'Content-Type: application/json' -d'
+{
+  "mappings": {
+    "entity": {
+      "properties": {
+        "id": {"type": "keyword"},
+        "label": {"type": "text"}
+      }
+    }
+  }
+}
+' > /dev/null
+
+echo "Importing dictionary..."
+for FILENAME in $(sh -c "ls $DICTIONARY-*"); do
+  echo "Processing $FILENAME..."
+  curl \
+    -f \
+    -H 'Content-Type: application/x-ndjson' \
+    -XPOST 'localhost:9200/dictionary/entity/_bulk?pretty' \
+    --data-binary \
+    "@$FILENAME" \
+    > /dev/null
+done
