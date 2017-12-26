@@ -1,0 +1,21 @@
+#!/bin/sh
+set -e
+
+export PYTHONPATH='src/'
+
+PAGE_LINKS_URL="http://downloads.dbpedia.org/2016-10/core-i18n/nl/page_links_nl.ttl.bz2"
+PAGE_LINKS="tmp/page_links_nl.ttl"
+
+CORPUS="tmp/page_links_nl.mm"
+DICTIONARY="tmp/page_links_nl.dict"
+
+cd "$(dirname $0)/.."
+
+if [ ! -e "$PAGE_LINKS" ]; then
+  curl "$PAGE_LINKS_URL" | bunzip2 > "$PAGE_LINKS"
+fi
+
+if [ ! -e "$CORPUS" ]; then
+  echo "Creating $CORPUS..."
+  python -m link.topic_model.create_corpus "$PAGE_LINKS" "$CORPUS" "$DICTIONARY"
+fi

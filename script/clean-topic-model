@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+
+rm -f tmp/page_links_nl.dict
+rm -f tmp/page_links_nl.mm*

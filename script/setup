@@ -11,3 +11,4 @@ fi
 
 script/setup-knowledge-graph
 script/setup-nlp
+script/setup-topic-model
