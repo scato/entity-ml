@@ -16,7 +16,7 @@ fi
 
 if [ ! -e "$DICTIONARY" ]; then
   echo "Creating $DICTIONARY..."
-  cat "$LABELS" \
+  pv "$LABELS" \
     | python -m link.nlp.create_dictionary \
     > "$DICTIONARY"
 

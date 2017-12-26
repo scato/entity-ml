@@ -49,14 +49,14 @@ fi
 
 if [ ! -e "$NODES" ]; then
   echo "Creating $NODES..."
-  cat "$LABELS" "$CATEGORY_LABELS" \
+  pv "$LABELS" "$CATEGORY_LABELS" \
     | python -m link.knowledge_graph.create_nodes \
     > "$NODES"
 fi
 
 if [ ! -e "$EDGES" ]; then
   echo "Creating $EDGES..."
-  cat "$MAPPINGBASED_OBJECTS" "$ARTICLE_CATEGORIES" "$SKOS_CATEGORIES" \
+  pv "$MAPPINGBASED_OBJECTS" "$ARTICLE_CATEGORIES" "$SKOS_CATEGORIES" \
     | python -m link.knowledge_graph.create_edges \
     > "$EDGES"
 fi
