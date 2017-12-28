@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+export PYTHONPATH='src/'
+
+export CORPUS="tmp/page_links_nl.mm"
+export DICTIONARY="tmp/page_links_nl.dict"
+
+cd "$(dirname $0)/.."
+
+if [ -z "$1" ]; then
+  echo "Usage: $0 \"identifier\""
+  exit 1
+fi
+
+python -m link.topic_model.console "$1"
