@@ -8,6 +8,8 @@ PAGE_LINKS="tmp/page_links_nl.ttl"
 
 CORPUS="tmp/page_links_nl.mm"
 DICTIONARY="tmp/page_links_nl.dict"
+LSI="tmp/page_links_nl.lsi"
+INDEX="tmp/page_links_nl.index"
 
 cd "$(dirname $0)/.."
 
@@ -18,4 +20,9 @@ fi
 if [ ! -e "$CORPUS" ]; then
   echo "Creating $CORPUS..."
   python -m link.topic_model.create_corpus "$PAGE_LINKS" "$CORPUS" "$DICTIONARY"
+fi
+
+if [ ! -e "$LSI" ]; then
+  echo "Creating $LSI..."
+  python -m link.topic_model.create_model "$CORPUS" "$DICTIONARY" "$LSI" "$INDEX"
 fi

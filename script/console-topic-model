@@ -5,6 +5,8 @@ export PYTHONPATH='src/'
 
 export CORPUS="tmp/page_links_nl.mm"
 export DICTIONARY="tmp/page_links_nl.dict"
+export LSI="tmp/page_links_nl.lsi"
+export INDEX="tmp/page_links_nl.index"
 
 cd "$(dirname $0)/.."
 

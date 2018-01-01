@@ -1,6 +1,5 @@
 from collections import defaultdict
 from itertools import islice
-import logging
 from pprint import pprint
 import sys
 
@@ -8,7 +7,7 @@ from gensim import corpora, models, matutils
 from scipy.sparse import dok_matrix
 from tqdm import tqdm
 
-from link.utils import read_object_tuples, get_num_lines
+from link.utils import read_object_tuples, get_num_lines, enable_logging
 
 
 MIN_OUT_DEGREE = 2
@@ -82,7 +81,7 @@ def main():
         )
         exit(1)
 
-    logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+    enable_logging()
 
     frequent_page_links = read_frequent_page_links(sys.argv[1])
     dictionary = create_dictionary(sys.argv[3], frequent_page_links)

@@ -1,3 +1,4 @@
+import logging
 import mmap
 import re
 
@@ -52,3 +53,10 @@ def get_num_lines(filename):
         buf = read_f(buf_size)
 
     return lines
+
+
+def enable_logging():
+    logging.basicConfig(
+        format='%(asctime)s : %(levelname)s : %(message)s',
+        level=logging.INFO
+    )

@@ -3,3 +3,5 @@ set -e
 
 rm -f tmp/page_links_nl.dict
 rm -f tmp/page_links_nl.mm*
+rm -f tmp/page_links_nl.lsi*
+rm -f tmp/page_links_nl.index*
