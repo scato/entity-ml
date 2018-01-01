@@ -3,11 +3,25 @@ set -e
 
 export PYTHONPATH='src/'
 
+export CORPUS="tmp/page_links_nl.mm"
+export DICTIONARY="tmp/page_links_nl.dict"
+export LSI="tmp/page_links_nl.lsi"
+export INDEX="tmp/page_links_nl.index"
+
 cd "$(dirname $0)/.."
 
 if [ -z "$1" ]; then
   echo "Usage: $0 \"sentence\""
   exit 1
+fi
+
+if ! brew services list | grep -q "elasticsearch *started"; then
+  brew services start elasticsearch
+
+  echo "Waiting for elasticsearch..."
+  while ! curl -Is "localhost:9200" > /dev/null; do
+    sleep 1
+  done
 fi
 
 python -m link.nlp.console "$1"
