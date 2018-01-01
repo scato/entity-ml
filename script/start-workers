@@ -1,0 +1,20 @@
+#!/bin/sh
+
+export PYRO_SERIALIZERS_ACCEPTED=pickle
+export PYRO_SERIALIZER=pickle
+export PYRO_LOGLEVEL=DEBUG
+export PYRO_LOGFILE={stderr}
+
+# start name server
+python -m Pyro4.naming -n 0.0.0.0 &
+echo $! >> tmp/pids
+
+# start two workers
+python -m gensim.models.lsi_worker &
+echo $! >> tmp/pids
+python -m gensim.models.lsi_worker &
+echo $! >> tmp/pids
+
+# start dispatcher
+python -m gensim.models.lsi_dispatcher &
+echo $! >> tmp/pids

@@ -25,7 +25,7 @@ def main():
         num_topics=500,
         id2word=dictionary,
         chunksize=20000,
-        distributed=False
+        distributed=True
     )
     lsi.save(sys.argv[3])
 

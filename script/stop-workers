@@ -1,0 +1,4 @@
+#!/bin/sh
+
+cat tmp/pids | xargs kill
+rm -f tmp/pids

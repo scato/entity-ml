@@ -3,3 +3,4 @@ elasticsearch>=6.0.0,<7.0.0
 tqdm==4.19.5
 gensim==3.2.0
 scipy==1.0.0
+Pyro4==4.63

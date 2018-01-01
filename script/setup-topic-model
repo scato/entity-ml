@@ -2,6 +2,10 @@
 set -e
 
 export PYTHONPATH='src/'
+export PYRO_SERIALIZERS_ACCEPTED=pickle
+export PYRO_SERIALIZER=pickle
+export PYRO_LOGLEVEL=DEBUG
+export PYRO_LOGFILE={stderr}
 
 PAGE_LINKS_URL="http://downloads.dbpedia.org/2016-10/core-i18n/nl/page_links_nl.ttl.bz2"
 PAGE_LINKS="tmp/page_links_nl.ttl"
